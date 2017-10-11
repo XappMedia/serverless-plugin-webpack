@@ -12,7 +12,9 @@ const setPackage = R.pipe(
   R.assoc('individually', true)
 );
 
+const fnName = R.compose(R.replace(/\.[^.]+$/, ''), R.prop('handler'));
 const fnPath = R.compose(R.replace(/\.[^.]+$/, '.js'), R.prop('handler'));
+const fnTsPath = R.compose(R.replace(/\.[^.]+$/, '.ts'), R.prop('handler'));
 
 const setFnsPackage = R.map(
   R.pipe(
@@ -34,7 +36,9 @@ const setFnsArtifacts = (serverlessPath, fns) => R.map(
 
 module.exports = {
   setPackage,
+  fnName,
   fnPath,
+  fnTsPath,
   setFnsPackage,
   setFnsArtifacts,
 };

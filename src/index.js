@@ -11,7 +11,7 @@ const webpackFolder = '.webpack';
 // Webpack defaults
 const webpackDefaultOutput = {
   libraryTarget: 'commonjs2',
-  filename: '[name]',
+  filename: '[name].js',
 };
 const webpackDefaultConfig = 'webpack.config.js';
 
