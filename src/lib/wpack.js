@@ -1,37 +1,31 @@
 const path = require('path');
-const R = require('ramda');
 const webpack = require('webpack'); // eslint-disable-line import/no-unresolved
 const service = require('./service');
 
 /**
- * Sets webpack entry
- * @param {object} fn Serverless function object
+ * Creates the inputs element to be used in the final config
+ * @param {object} fns Serverless functions object
  * @param {string} servicePath Serverless service path
- * @returns {object} Webpack configuration
  */
-const setEntry = (fn, servicePath) =>
-  R.assoc(
-    'entry',
-    R.objOf(
-      service.fnName(fn),
-      path.join(servicePath, service.fnTsPath(fn))
-    )
-  );
+const createInputs = (fns, servicePath) => {
+  return Object.keys(fns).reduce((last, fnKey) => {
+    var fn = fns[fnKey];
+    return Object.assign({}, last, {
+      [service.fnName(fn)]: path.join(servicePath, service.fnTsPath(fn))
+    })
+  }, {});
+}
 
 /**
- * Sets webpack output in configuration
+ * Creates the outputs element to be used in the final webpack config
  * @param {object} defaultOutput Webpack default output object
  * @param {string} outputPath Webpack output path
- * @returns {object} Webpack configuration
  */
-const setOutput = (defaultOutput, outputPath) =>
-  R.assoc(
-    'output',
-    R.merge(
-      defaultOutput,
-      { path: outputPath }
-    )
-  );
+const createOutput = (defaultOutput, outputPath) => {
+  return Object.assign({}, defaultOutput, {
+    path: outputPath
+  });
+}
 
 /**
  * Creates an array of webpack configurations
@@ -42,15 +36,12 @@ const setOutput = (defaultOutput, outputPath) =>
  * @param {string} folder Webpack output folder
  * @returns {array} Array of webpack configurations
  */
-const createConfigs = (fns, config, servicePath, defaultOutput, folder) =>
-  R.map(
-    fn =>
-      R.pipe(
-        setEntry(fn, servicePath),
-        setOutput(defaultOutput, path.join(servicePath, folder))
-      )(config),
-    R.values(fns)
-  );
+const createConfigs = (fns, config, servicePath, defaultOutput, folder) => {
+  return Object.assign({}, config, {
+    entry: createInputs(fns, servicePath),
+    output: createOutput(defaultOutput, path.join(servicePath, folder))
+  });
+}
 
 /**
  * Runs webpack with an array of configurations
